@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(uuid())
+  full_name  String
+  email      String     @unique
+  password   String
+  role       UserRole   @default(MEMBERS)
+  is_deleted Boolean    @default(false)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  ideas      Idea[]
+  categories Category[]
+  votes      Vote[]
+  comments   Comment[]
+  purchases  Purchase[] 
+}
+
+model Idea {
+  id          String     @id @default(uuid())
+  title       String
+  problem     String
+  statement   String
+  solution    String
+  description String
+  images      String?
+  status      StatusType @default(UNDER_REVIEW)
+  draft       IdeaType   @default(FREE)
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  votes       Vote[]
+  comments    Comment[]
+  categoryId  String
+  category    Category   @relation(fields: [categoryId], references: [id])
+  feedback    String? 
+  Purchase    Purchase[]
+}
+
+model Category {
+  id     String       @id @default(uuid())
+  name   CategoryType
+  ideas  Idea[]
+  User   User?        @relation(fields: [userId], references: [id])
+  isDeleted Boolean
+  userId String?
+}
+
+model Vote {
+  id        String    @id @default(uuid())
+  vote_type Vote_Type
+  ideaId    String
+  idea      Idea      @relation(fields: [ideaId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([ideaId, userId]) // Ensure one vote per user per idea
+}
+
+model Comment {
+  id         String    @id @default(uuid())
+  content    String
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  ideaId     String
+  idea       Idea      @relation(fields: [ideaId], references: [id])
+  parentId   String? 
+  parent     Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies    Comment[] @relation("CommentReplies")
+  is_deleted Boolean   @default(false)
+}
+
+model Purchase {
+  id     String   @id @default(uuid())
+  userId String
+  user   User     @relation(fields: [userId], references: [id])
+  ideaId String
+  idea   Idea     @relation(fields: [ideaId], references: [id])
+  date   DateTime @default(now())
+}
+
+// == ENUMS ==
+
+enum UserRole {
+  ADMIN
+  MEMBERS
+}
+
+enum IdeaType {
+  PAID
+  FREE
+}
+
+enum StatusType {
+  UNDER_REVIEW
+  Approved
+  Rejected
+}
+
+enum CategoryType {
+  ENERGY
+  WASTE
+  TRANSPORTTATION
+}
+
+enum Vote_Type {
+  UP
+  DOWN
+}
