@@ -1,7 +1,9 @@
 import express from 'express';
 import { AuthRoutes } from '../modules/auth/auth.routes';
 import { CategoryRouter } from '../modules/category/category.router';
+import { CommentsRouter } from '../modules/comments/comments.router';
 import { userRouter } from '../modules/user/user.router';
+import VoteRouter from '../modules/vote/vote.router';
 
 const router = express.Router();
 
@@ -22,6 +24,14 @@ const routes: Route[] = [
     {
         path: '/category',
         route: CategoryRouter
+    },
+    {
+        path: '/comments',
+        route: CommentsRouter
+    },
+    {
+        path: '/vote',
+        route: VoteRouter
     }
 
 ];

@@ -48,7 +48,7 @@ model Category {
   name   CategoryType
   ideas  Idea[]
   User   User?        @relation(fields: [userId], references: [id])
-  isDeleted Boolean
+  isDeleted Boolean @default(false)
   userId String?
 }
 

@@ -4,6 +4,17 @@ import AppError from "../../errors/AppError"
 import prisma from "../../utils/prisma"
 
 const CreateCategory = async (payload: Category) => {
+    const data = await prisma.user.findUnique({
+        where: {
+            id: payload.userId as string,
+            is_deleted: false,
+            role: 'ADMIN'
+        }
+    });
+
+    if (!data) {
+        throw new AppError(httpStatus.FORBIDDEN, 'Admin access required');
+    }
     const result = prisma.category.create(
         {
             data: payload
@@ -16,22 +27,12 @@ const GetAllCategory = async () => {
     return result
 }
 const GetSingleCategory = async (id: string,) => {
-    const data = await prisma.user.findUnique({
-        where: {
-            id: id,
-            is_deleted: false,
-            role: 'ADMIN'
-        }
-    });
-
-    if (!data) {
-        throw new AppError(httpStatus.FORBIDDEN, 'Admin access required');
-    }
+    
 
     // Get the category
     const category = await prisma.category.findUnique({
         where: {
-            id: data.id,
+            id: id,
         }
     });
 
