@@ -45,7 +45,7 @@ model Idea {
 
 model Category {
   id        String       @id @default(uuid())
-  name      CategoryType
+  name      String
   ideas     Idea[]
   User      User?        @relation(fields: [userId], references: [id])
   isDeleted Boolean      @default(false)
@@ -103,11 +103,7 @@ enum StatusType {
   Rejected
 }
 
-enum CategoryType {
-  ENERGY
-  WASTE
-  TRANSPORTTATION
-}
+
 
 enum Vote_Type {
   UP
